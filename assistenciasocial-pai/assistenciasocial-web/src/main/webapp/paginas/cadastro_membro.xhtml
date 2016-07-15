@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+	<h:head> 
+		
+	</h:head>
+
+	<h:body>
+	<div align="center" style="width:80%">
+
+		<h:form id="form_cad_cliente">
+			<div align="center" class="ui-g" style="width:100%">
+				<p:panelGrid columns="4" id="panelCadastro">
+					<f:facet name="header">
+						<p:row>
+							<p:column colspan="4"><p:outputLabel value="Cadastro de Clientes"/></p:column>
+						</p:row>
+					</f:facet>
+				
+					<p:outputLabel value="Nome"/>
+					<p:inputText value="#{membroMB.membro.nome}" maxlength="100" size="40"/>
+					<p:outputLabel value="CPF: "/>
+					<p:inputText value="#{membroMB.membro.cpf}" maxlength="20" size="20" />
+					<p:outputLabel value="Endereço"/>
+					<p:inputText value="#{membroMB.membro.endereco}" maxlength="255" size="40"/>
+					
+					<p:outputLabel value="Bairro: "/>
+					<p:inputText value="#{membroMB.membro.bairro}" maxlength="100" size="25" />
+					<p:outputLabel value="Cidade"/>
+					<p:inputText value="#{membroMB.membro.cidade}" maxlength="60" size="40"/>
+					<p:outputLabel value="Estado: "/>
+					<p:selectOneMenu value="#{membroMB.membro.estado}" filter="true" filterMatchMode="startsWith">
+						<f:selectItems value="#{membroMB.listaUF}" var="uf" itemLabel="#{uf.descricao}" itemValue="#{uf.sigla}"/>
+					</p:selectOneMenu>
+					
+						<p:outputLabel value="Telefone"/>
+						<p:inputText value="#{membroMB.membro.telefone}" maxlength="30" size="20" />
+						<p:outputLabel value="Email: "/>
+						<p:inputText value="#{membroMB.membro.email}" maxlength="100" size="30" />
+				</p:panelGrid>
+			</div>
+			<br></br>
+			<br></br>
+			<div style="width: 100%">
+				<p:dataTable id="tblMembro" var="membro" value="#{membroMB.listaMembros}" selection="#{membroMB.membro}" rowKey="#{membro.id}"
+						 paginator="true"  rows="10"  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="10,20,30" emptyMessage="Nemhum membro cadastrado" >
+			        <p:column  selectionMode="single" style="width:5%"  />
+			        <p:ajax event="rowSelectRadio" update=":form_cad_cliente:panelCadastro" listener="#{membroMB.selecionaLinhaTabela}"/>
+			        <f:facet name="header">
+			            Lista de Membros
+			        </f:facet>
+			        <p:column headerText="Nome">
+			            <h:outputText value="#{membro.nome}" />
+			        </p:column>
+			        <p:column headerText="Endereço">
+			            <h:outputText value="#{membro.endereco}" />
+			        </p:column>
+			        <p:column headerText="Telefone">
+			            <h:outputText value="#{membro.telefone}" />
+			        </p:column>
+			    </p:dataTable>
+				<br>
+				</br>
+				<div style="width: 80%" align="center">
+					<p:commandButton action="#{membroMB.novo}" value="Novo"/>
+					<p:commandButton action="#{membroMB.salvar}" value="Salvar" update=":form_cad_cliente:tblMembro"/>
+					<p:commandButton action="#{membroMB.excluir}" value="Excluir"/>
+					<p:commandButton action="#{membroMB.voltar}" value="Voltar"/>
+				</div>
+			</div>
+		</h:form>
+	</div>
+
+
+	</h:body>
+
+
+
+</html>
