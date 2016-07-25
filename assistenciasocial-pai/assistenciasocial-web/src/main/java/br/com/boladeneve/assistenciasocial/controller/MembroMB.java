@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.faces.view.ViewScoped;
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -15,8 +16,8 @@ import br.com.boladeneve.assistenciasocial.negocio.entidade.Membro;
 import br.com.boladeneve.assistenciasocial.negocio.entidade.UF;
 import br.com.boladeneve.assistenciasocial.negocio.facade.MembroFacade;
 
+@javax.faces.view.ViewScoped
 @Named("membroMB")
-@ViewScoped
 public class MembroMB implements Serializable {
 
 	/**
@@ -25,16 +26,16 @@ public class MembroMB implements Serializable {
 	private static final long serialVersionUID = 1775244581540406599L;
 	
 	@Inject
-	private MembroFacade facade;
+	private MembroFacade membroFacade;	
 
 	
-	public MembroFacade getFacade() {
-		return facade;
+	public MembroFacade getMembroFacade() {
+		return membroFacade;
 	}
 	
 	
-	public void setFacade(MembroFacade facade) {
-		this.facade = facade;
+	public void setMembroFacade(MembroFacade facade) {
+		this.membroFacade = facade;
 	}
 
 	private Membro membro;
@@ -47,7 +48,6 @@ public class MembroMB implements Serializable {
 
 	public void setMembroSelecionado(Membro membroSelecionado) {
 		this.membroSelecionado = membroSelecionado;
-		this.membro = membroSelecionado;
 	}
 
 
@@ -93,6 +93,7 @@ public class MembroMB implements Serializable {
 	public void init(){
 		limpar();
 		listar();
+		carregaListas();
 	}
 
 	public void novo(){
@@ -101,28 +102,35 @@ public class MembroMB implements Serializable {
 	
 	public String salvar(){
 		//se tiver id é porque é alteração então busca no banco o objeto atachado para não ter problema de detached entity
-		if (membro!=null && membro.getId()!=null){
-			membro = facade.buscarMembro(membro.getId());
-			facade.alterar(membro);
+		try{
+			if (membro!=null && membro.getId()!=null){
+				membroFacade.alterar(membro);
+			}
+			else{
+				membroFacade.salvar(membro);
+				limpar();
+			}
+			listar();
 		}
-		else{
-			facade.salvar(membro);
-			limpar();
+		catch(Exception e){
+			FacesContext.getCurrentInstance().addMessage("Erro", new FacesMessage("Erro na transação"));
 		}
-		listar();
 		return null;
 	}
 	
 	public void listar(){
-		listaMembros = facade.listarTodos();
+		listaMembros = membroFacade.listarTodos();
 	}
 
 	public void buscarMembro(Long id){
-		this.membro = facade.buscarMembro(id);
+		this.membro = membroFacade.buscarMembro(id);
 	}
 
 	public void limpar(){
 		membro = new Membro();
+	}
+
+	public void carregaListas(){
 		listaUF = new ArrayList<UF>();
 		UF uf = new UF();
 		uf.setSigla("RJ");
@@ -143,19 +151,20 @@ public class MembroMB implements Serializable {
 		uf.setSigla("PO");
 		uf.setDescricao("PO");
 		listaUF.add(uf);
-		
-	}
 
+	}
+	
 	
 	public void excluir(){
-		membro = facade.buscarMembro(membro.getId());
-		facade.excluir(membro);
-		listaMembros = facade.listarTodos();
+		//this.membro = facade.buscarMembro(this.membro.getId());
+		membroFacade.excluir(this.membro);
+		listaMembros = membroFacade.listarTodos();
+		limpar();
 	}
 	
 	public void selecionaLinhaTabela(SelectEvent e) {
-		membro = new Membro();
-		membro = (Membro) e.getObject();
+		this.membro = (Membro) e.getObject();
+		this.membro = membroFacade.buscarMembro(membro.getId());
     }
 	
 }

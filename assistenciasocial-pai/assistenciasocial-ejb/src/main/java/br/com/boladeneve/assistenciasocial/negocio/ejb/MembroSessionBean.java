@@ -3,7 +3,6 @@ package br.com.boladeneve.assistenciasocial.negocio.ejb;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.ejb.EJB;
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
@@ -11,6 +10,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.transaction.Transactional;
 
 import br.com.boladeneve.assistenciasocial.negocio.entidade.Membro;
@@ -20,8 +20,12 @@ import br.com.boladeneve.assistenciasocial.negocio.persistencia.util.view.Generi
  * Session Bean implementation class MembroSessionBean
  */
 @Stateless
+@Named("membroBean")
 @LocalBean
-public class MembroSessionBean implements Serializable  {
+@Transactional
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
+public class MembroSessionBean implements Serializable,MembroBean  {
 
 	/**
 	 * 
@@ -33,35 +37,39 @@ public class MembroSessionBean implements Serializable  {
 	
 	
     public List<Membro> listarMembros(){
-    	return (List<Membro>) dao.buscarTodos(0l, dao.buscaQuantidadeTotal(), null);
+		return null;
     }
-
+    
     public MembroSessionBean(){
-    	dao.setClassePersistente(Membro.class);
+    	System.out.println("construtor MembroSessionBean");
     }
     
-    
-    @Transactional
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void salvar(Membro membro) {
-		dao.salvar(membro);
+		dao.setClassePersistente(Membro.class);
+    	dao.salvar(membro);
 	}
 
-    @Transactional
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void excluir(Membro membro){
-		dao.remover(membro);
+		dao.setClassePersistente(Membro.class);
+    	dao.remover(membro);
 	}
 
 
 	public Membro buscarMembro(Long id) {
+		dao.setClassePersistente(Membro.class);
 		return (Membro) dao.buscarPorChave(new Long(id));
 	}
 
-    @Transactional
-	@TransactionAttribute(TransactionAttributeType.REQUIRED)
 	public void alterar(Membro membro) {
+		dao.setClassePersistente(Membro.class);
 		dao.merge(membro);
+	}
+
+	@Override
+	public List<Membro> listarTodos() {
+		dao.setClassePersistente(Membro.class);
+		// TODO Auto-generated method stub
+		return (List<Membro>) dao.buscarTodos(0l, dao.buscaQuantidadeTotal(), null);
 	}
 	
 }

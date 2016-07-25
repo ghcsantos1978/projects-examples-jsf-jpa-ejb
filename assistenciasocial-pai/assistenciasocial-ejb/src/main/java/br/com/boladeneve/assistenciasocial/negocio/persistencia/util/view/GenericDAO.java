@@ -2,15 +2,17 @@ package br.com.boladeneve.assistenciasocial.negocio.persistencia.util.view;
 
 import java.util.List;
 
+import javax.ejb.Local;
 import javax.persistence.criteria.Order;
 
 import org.hibernate.Criteria;
 import org.hibernate.criterion.Example;
 
+@Local
 public interface GenericDAO<T> {
 
 	
-	public void refresh(Class object);
+	public void refresh(T object);
 	
 	 public void flush() ;
 	

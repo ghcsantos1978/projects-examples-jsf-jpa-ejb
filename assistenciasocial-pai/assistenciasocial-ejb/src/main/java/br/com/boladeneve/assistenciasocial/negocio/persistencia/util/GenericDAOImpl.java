@@ -3,11 +3,21 @@ package br.com.boladeneve.assistenciasocial.negocio.persistencia.util;
 import java.io.Serializable;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+import javax.ejb.LocalBean;
+import javax.ejb.Stateless;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
+import javax.ejb.TransactionManagement;
+import javax.ejb.TransactionManagementType;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 import javax.persistence.criteria.Order;
 import javax.transaction.Transactional;
@@ -24,6 +34,12 @@ import br.com.boladeneve.assistenciasocial.negocio.persistencia.util.view.Generi
  * Session Bean implementation Object GenericDAOImpl
  */
 
+@Stateless
+@Named
+@LocalBean
+@Transactional
+@TransactionManagement(TransactionManagementType.CONTAINER)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 
 	/**
@@ -31,14 +47,39 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	 */
 	private static final long serialVersionUID = 4424304693550760340L;
 
-	@Produces
-	@PersistenceContext(unitName="assistenciasocialPU")
-	private static EntityManager manager;
-	 
-	private Class classePersistente;
+	
+	/*private static EntityManagerFactory entityFactory;
 
+	
+	private static EntityManagerFactory getEntityFactory() {
+		if (entityFactory == null){
+			entityFactory = Persistence.createEntityManagerFactory("assistenciasocialPU");
+		}
+		return entityFactory;
+	}
+	*/
+
+
+	@PersistenceContext(unitName="assistenciasocialPU")
+	@Produces
+	private static EntityManager manager;
+	
+	
+	/*private static EntityManager getManager() {
+		if (manager == null){
+			manager = getEntityFactory().createEntityManager();
+		}
+		return manager;
+	}
+	*/
+	
+	
+	
+	private static Class classePersistente;
+
+	
 	public GenericDAOImpl(){
-		
+		System.out.println("teste");
 	}
 	
 	public void setClassePersistente(Class classePersistente) {
@@ -51,7 +92,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  * @param object
 	  *            objeto a ser atualizado
 	  */
-	 public void refresh(Class object) {
+	 public void refresh(T object) {
 		 manager.refresh(object);
 	 }
 	
@@ -68,8 +109,8 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *
 	  */
 	 public void clear() {
-		flush();
-		manager.clear();
+		 flush();
+		 manager.clear();
 	 }
 	
 	 /**
@@ -79,10 +120,9 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *            a ser realizado o merge
 	  * @return objeto que foi executado o merge
 	  */
-	 @Transactional
-	 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	 public void merge(T objeto) {
-		 objeto = manager.merge(objeto);
+		 manager.joinTransaction();
+		 objeto =  manager.merge(objeto);
 		 flush();
 	 }
 	
@@ -93,6 +133,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *            a ser salvo
 	  */
 	 public void salvar(T objeto) {
+		 manager.joinTransaction();
 		 manager.persist(objeto);
 	 }
 	
@@ -102,10 +143,9 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  * @param objeto
 	  *            a ser removido
 	  */
-	 @Transactional
-	 @TransactionAttribute(TransactionAttributeType.REQUIRED)
 	 public void remover(T objeto) {
-		 manager.remove(objeto);
+		 manager.joinTransaction();
+		 manager.remove(manager.contains(objeto)?objeto:manager.merge(objeto));
 	 }
 	
 	 /**
@@ -115,6 +155,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *            identificadora do objeto
 	  */
 	 public void removerPorChave(Integer chave) {
+		 manager.joinTransaction();
 		 manager.createQuery(
 	    "delete from " + getClassePersistente().getName()
 	      + " where id = " + chave).executeUpdate();
@@ -130,7 +171,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	 public T buscarPorChave(Long chave) {
 		  T instance = null;
 		  try {
-		   instance = (T) manager.find(getClassePersistente(), chave);
+		   instance = (T)  manager.find(getClassePersistente(), chave);
 		  } catch (RuntimeException re) {
 		   re.printStackTrace();
 		  }
@@ -148,7 +189,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  * @return Lista de objetos retornada
 	  */
 	 public List<T> buscarPorExemplo(T objeto, Order... ordenacoes) {
-		  Session session = (Session) manager.getDelegate();
+		  Session session = (Session)  manager.getDelegate();
 		  Example example = criaExemplo(objeto);
 		  Criteria criteria = session.createCriteria(objeto.getClass()).add(
 		    example);
@@ -209,7 +250,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	 public List buscarTodos(Order... ordenacoes) {
 		  List results = null;
 		  try {
-		   Query query = manager.createQuery(
+		   Query query =  manager.createQuery(
 		     "from " + getClassePersistente().getName()
 		       + adicionaOrderByHql(ordenacoes));
 		   results = query.getResultList();
@@ -236,7 +277,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 		   Long indiceFinal, Order... ordenacoes) {
 		   List<T> results = null;
 		  try {
-		   Query query = manager.createQuery(
+		   Query query =  manager.createQuery(
 		     "from " + getClassePersistente().getName()
 		       + adicionaOrderByHql(ordenacoes));
 		   query.setFirstResult(indiceInicial.intValue());
@@ -261,15 +302,14 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	 public String adicionaOrderByHql(Order... ordenacoes) {
 		  String result = "";
 		  if (ordenacoes!=null && ordenacoes.length > 0) {
-		   StringBuilder builder = new StringBuilder(" order by ");
-		   for (int i = 0; i < ordenacoes.length - 1; i++) {
-		    builder.append(ordenacoes[i].toString());
-		    builder.append(", ");
-		   }
-		   builder.append(ordenacoes[ordenacoes.length - 1]);
-		   result = builder.toString();
-	  }
-	
+			   StringBuilder builder = new StringBuilder(" order by ");
+			   for (int i = 0; i < ordenacoes.length - 1; i++) {
+			    builder.append(ordenacoes[i].toString());
+			    builder.append(", ");
+				   builder.append(ordenacoes[ordenacoes.length - 1]);
+				   result = builder.toString();
+			   }
+		  }
 		  return result;
 	 }
 	
@@ -288,7 +328,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  * @return um objeto do tipo Criteria do Hibernate
 	  */
 	 public Criteria criaCriteria() {
-		  Session session = (Session) manager.getDelegate();
+		  Session session = (Session)  manager.getDelegate();
 		  return session.createCriteria(getClassePersistente());
 	 }
 	
