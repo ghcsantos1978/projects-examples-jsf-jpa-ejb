@@ -36,6 +36,7 @@
 					<p:inputText value="#{membroMB.membro.cidade}" maxlength="60" size="40"/>
 					<p:outputLabel value="Estado: "/>
 					<p:selectOneMenu value="#{membroMB.membro.estado}" filter="true" filterMatchMode="startsWith">
+						<f:selectItem itemLabel="Selecione..." itemValue=""></f:selectItem>
 						<f:selectItems value="#{membroMB.listaUF}" var="uf" itemLabel="#{uf.descricao}" itemValue="#{uf.sigla}"/>
 					</p:selectOneMenu>
 					
@@ -48,7 +49,7 @@
 			<br></br>
 			<br></br>
 			<div style="width: 100%">
-				<p:dataTable id="tblMembro" var="membro" value="#{membroMB.listaMembros}" selection="#{membroMB.membro}" rowKey="#{membro.id}"
+				<p:dataTable id="tblMembro" var="membro" value="#{membroMB.listaMembros}" selection="#{membroMB.membroSelecionado}" rowKey="#{membro.id}"
 						 paginator="true"  rows="10"  paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
                          rowsPerPageTemplate="10,20,30" emptyMessage="Nemhum membro cadastrado" >
 			        <p:column  selectionMode="single" style="width:5%"  />
@@ -69,9 +70,9 @@
 				<br>
 				</br>
 				<div style="width: 80%" align="center">
-					<p:commandButton action="#{membroMB.novo}" value="Novo"/>
-					<p:commandButton action="#{membroMB.salvar}" value="Salvar" update=":form_cad_cliente:tblMembro"/>
-					<p:commandButton action="#{membroMB.excluir}" value="Excluir"/>
+					<p:commandButton action="#{membroMB.novo}" value="Novo" update=":form_cad_cliente:panelCadastro" />
+					<p:commandButton action="#{membroMB.salvar}" value="Salvar" update=":form_cad_cliente:tblMembro,:form_cad_cliente:panelCadastro"/>
+					<p:commandButton action="#{membroMB.excluir}" value="Excluir" update=":form_cad_cliente:tblMembro,:form_cad_cliente:panelCadastro"/>
 					<p:commandButton action="#{membroMB.voltar}" value="Voltar"/>
 				</div>
 			</div>
