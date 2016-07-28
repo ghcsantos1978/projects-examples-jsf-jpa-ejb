@@ -13,6 +13,6 @@ public interface MembroBean {
 	public void salvar(Membro membro);
 	public void excluir(Membro membro);
 	public Membro buscarMembro(Long id);
-	public void alterar(Membro membro);
-
+	public Membro alterar(Membro membro);
+	public void atualizarBD();
 }

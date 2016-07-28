@@ -10,11 +10,15 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagement;
 import javax.ejb.TransactionManagementType;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.Dependent;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.FlushModeType;
 import javax.persistence.Persistence;
 import javax.persistence.PersistenceContext;
 import javax.persistence.PersistenceUnit;
@@ -37,9 +41,6 @@ import br.com.boladeneve.assistenciasocial.negocio.persistencia.util.view.Generi
 @Stateless
 @Named
 @LocalBean
-@Transactional
-@TransactionManagement(TransactionManagementType.CONTAINER)
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 
 	/**
@@ -61,8 +62,7 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 
 
 	@PersistenceContext(unitName="assistenciasocialPU")
-	@Produces
-	private static EntityManager manager;
+	private EntityManager manager;
 	
 	
 	/*private static EntityManager getManager() {
@@ -120,10 +120,10 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *            a ser realizado o merge
 	  * @return objeto que foi executado o merge
 	  */
-	 public void merge(T objeto) {
-		 manager.joinTransaction();
+	 public T merge(T objeto) {
 		 objeto =  manager.merge(objeto);
 		 flush();
+		 return objeto;
 	 }
 	
 	 /**
@@ -133,7 +133,6 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *            a ser salvo
 	  */
 	 public void salvar(T objeto) {
-		 manager.joinTransaction();
 		 manager.persist(objeto);
 	 }
 	
@@ -144,7 +143,6 @@ public class GenericDAOImpl<T>implements GenericDAO<T>, Serializable {
 	  *            a ser removido
 	  */
 	 public void remover(T objeto) {
-		 manager.joinTransaction();
 		 manager.remove(manager.contains(objeto)?objeto:manager.merge(objeto));
 	 }
 	

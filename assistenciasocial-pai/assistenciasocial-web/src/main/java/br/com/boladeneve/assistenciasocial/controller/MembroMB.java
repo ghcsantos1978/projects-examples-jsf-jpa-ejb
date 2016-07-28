@@ -101,7 +101,6 @@ public class MembroMB implements Serializable {
 	}
 	
 	public String salvar(){
-		//se tiver id é porque é alteração então busca no banco o objeto atachado para não ter problema de detached entity
 		try{
 			if (membro!=null && membro.getId()!=null){
 				membroFacade.alterar(membro);
@@ -163,6 +162,7 @@ public class MembroMB implements Serializable {
 	}
 	
 	public void selecionaLinhaTabela(SelectEvent e) {
+		//busca no banco a entidade gerenciada para manter o objeto atualizado e não ocorrer o erro de detached
 		this.membro = (Membro) e.getObject();
 		this.membro = membroFacade.buscarMembro(membro.getId());
     }

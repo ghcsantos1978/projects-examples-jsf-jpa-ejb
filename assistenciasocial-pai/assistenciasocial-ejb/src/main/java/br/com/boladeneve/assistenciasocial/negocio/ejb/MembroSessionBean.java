@@ -5,13 +5,8 @@ import java.util.List;
 
 import javax.ejb.LocalBean;
 import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.transaction.Transactional;
 
 import br.com.boladeneve.assistenciasocial.negocio.entidade.Membro;
 import br.com.boladeneve.assistenciasocial.negocio.persistencia.util.view.GenericDAO;
@@ -22,9 +17,6 @@ import br.com.boladeneve.assistenciasocial.negocio.persistencia.util.view.Generi
 @Stateless
 @Named("membroBean")
 @LocalBean
-@Transactional
-@TransactionManagement(TransactionManagementType.CONTAINER)
-@TransactionAttribute(TransactionAttributeType.REQUIRED)
 public class MembroSessionBean implements Serializable,MembroBean  {
 
 	/**
@@ -60,9 +52,9 @@ public class MembroSessionBean implements Serializable,MembroBean  {
 		return (Membro) dao.buscarPorChave(new Long(id));
 	}
 
-	public void alterar(Membro membro) {
+	public Membro alterar(Membro membro) {
 		dao.setClassePersistente(Membro.class);
-		dao.merge(membro);
+		return dao.merge(membro);
 	}
 
 	@Override
@@ -70,6 +62,10 @@ public class MembroSessionBean implements Serializable,MembroBean  {
 		dao.setClassePersistente(Membro.class);
 		// TODO Auto-generated method stub
 		return (List<Membro>) dao.buscarTodos(0l, dao.buscaQuantidadeTotal(), null);
+	}
+	
+	public void atualizarBD(){
+		dao.flush();
 	}
 	
 }

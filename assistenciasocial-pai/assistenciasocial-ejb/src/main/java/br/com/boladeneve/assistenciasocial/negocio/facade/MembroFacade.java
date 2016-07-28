@@ -14,5 +14,5 @@ public interface MembroFacade {
 	public void salvar(Membro membro) throws SQLException;
 	public void excluir(Membro membro);
 	public Membro buscarMembro(Long id);
-	public void alterar(Membro membro) throws SQLException;
+	public void alterar(Membro membro) throws SQLException, Exception;
 }

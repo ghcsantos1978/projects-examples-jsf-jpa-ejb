@@ -18,7 +18,7 @@ public interface GenericDAO<T> {
 	
 	 public  void clear();
 
-	 public  void merge(T objeto);
+	 public T merge(T objeto);
 	
 	 public  void salvar(T objeto);
 	
