@@ -4,20 +4,17 @@
 		<provider>org.hibernate.ejb.HibernatePersistence</provider> 
 		<jta-data-source>java:jboss/datasources/assistenciasocialDS</jta-data-source>
 		<class>br.com.boladeneve.assistenciasocial.negocio.entidade.Membro</class> 
-		<properties> 
-			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect" /> 
-			<!-- <property name="hibernate.dialect" value="org.hibernate.dialect.MySQLDialect" />--> 
-			<property name="hibernate.hbm2ddl.auto" value="update" /> 
-			<property name="hibernate.show_sql" value="true" /> 
-			<property name="hibernate.format_sql" value="true" />
-			<!-- <property name="hibernate.transaction.factory_class" value="org.hibernate.transaction.CMTTransactionFactory"/>-->
-			<!-- <property name="hibernate.transaction.manager_lookup_class" value="org.hibernate.transaction.JBossTransactionManagerLookup"/>-->
-			<property name="defaultAutoCommit" value="false"/>
-			<!-- <property name="hibernate.current_session_context_class" value="jta"/> -->	
-			<!-- <property name="javax.persistence.jdbc.driver" value="com.mysql.jdbc.Driver" /> 
-			<property name="javax.persistence.jdbc.url" value="jdbc:mysql://localhost:3306/assistenciasocialbd" /> 
-			<property name="javax.persistence.jdbc.user" value="root" /> 
-			<property name="javax.persistence.jdbc.password" value="root" />-->
-		</properties>
+			<properties>
+				 <property name="defaultAutoCommit" value="false"/>
+				 <property name="javax.persistence.jdbc.driver" value="org.postgresql.Driver" />
+				 <property name="javax.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/assistenciasocialbd" ></property>
+				 <property name="javax.persistence.jdbc.user" value="postgres" />
+				 <property name="javax.persistence.jdbc.password" value="root" />
+				 <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQLDialect" />
+				 <property name="hibernate.connection.shutdown" value="true" />
+				 <property name="hibernate.hbm2ddl.auto" value="update" />
+				 <property name="hibernate.show_sql" value="true" />
+				 <property name="hibernate.format_sql" value="true"/>
+			 </properties>
 	</persistence-unit> 
 </persistence>
